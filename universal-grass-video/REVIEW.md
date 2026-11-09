@@ -1,6 +1,8 @@
 # Universal Grass · vídeo v2 · revisión de fotogramas clave
 
-Estado: **composiciones construidas, pendiente de aprobación antes de animar y exportar.**
+Estado: **animado y exportado** → `export/universal-grass-v2.mp4` (1080×1920, 25 fps, 625 fotogramas, 25,0 s, H.264).
+Revisado sobre el MP4 exportado (fotogramas extraídos cada 0,5 s): textos completos, una aplicación cada vez, cierre estable 4,5 s.
+Corregido tras la revisión del exportado: el relleno verde se adelanta para que la foto de instalación no se amplíe a pantalla completa.
 
 ## Láminas
 - `review/lamina-fotogramas-clave.jpg`: los seis fotogramas pedidos (apertura, servicio, aplicaciones, asesoramiento, presupuesto y cierre).

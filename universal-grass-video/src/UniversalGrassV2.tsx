@@ -71,7 +71,7 @@ export const UniversalGrassV2 = ({ showSafeZones }: { showSafeZones: boolean }) 
   return (
     <AbsoluteFill style={{ background: C.warm, fontFamily: FONT }}>
       {/* ---------------- frames ---------------- */}
-      <PhotoFrame moves={MAIN_MOVES} shots={MAIN_SHOTS} fill={C.forest} fillFrom={420} fillDur={22} label={COPY.inspiration} />
+      <PhotoFrame moves={MAIN_MOVES} shots={MAIN_SHOTS} fill={C.forest} fillFrom={412} fillDur={14} label={COPY.inspiration} />
       <PhotoFrame moves={SIDE_MOVES} shots={SIDE_SHOTS} label={COPY.inspiration} />
 
       {/* ---------------- 0–3 s · opening ---------------- */}
