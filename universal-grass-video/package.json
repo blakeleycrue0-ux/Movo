@@ -1,0 +1,23 @@
+{
+  "name": "universal-grass-video",
+  "private": true,
+  "version": "2.0.0",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "stills": "node scripts/stills.mjs",
+    "render": "remotion render src/index.ts UniversalGrassV2 out/universal-grass-v2.mp4 --browser-executable=/opt/pw-browsers/chromium --codec=h264 --crf=16"
+  },
+  "dependencies": {
+    "@fontsource/inter-tight": "^5.3.0",
+    "@remotion/bundler": "^4.0.542",
+    "@remotion/cli": "^4.0.542",
+    "@remotion/renderer": "^4.0.542",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.542"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "typescript": "^7.0.2"
+  }
+}
