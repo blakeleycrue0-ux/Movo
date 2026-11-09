@@ -331,12 +331,13 @@ language plpgsql stable security definer set search_path = public, private as $$
 declare u uuid := private.require_user();
 begin
   return jsonb_build_object(
-    'groups', coalesce((select jsonb_agg(private.group_json(g, u) order by g.is_official desc, last_at desc nulls last) from (
-        select g.*, c.last_message_at last_at from public.groups g
+    'groups', coalesce((select jsonb_agg(x.j order by x.official desc, x.last_at desc nulls last) from (
+        select private.group_json(g, u) j, g.is_official official, c.last_message_at last_at from public.groups g
           join public.group_members gm on gm.group_id = g.id and gm.user_id = u
           left join public.conversations c on c.kind = 'group' and c.group_id = g.id
-         where g.archived_at is null limit 8) g), '[]'),
-    -- Updates from my connections, projects shared in my groups, projects I saved, and my own.
+         where g.archived_at is null
+         order by g.is_official desc, c.last_message_at desc nulls last limit 8) x), '[]'),
+    -- Updates from my connections, my groups' shared projects, saved projects, my own, and people with shared interests.
     'updates', coalesce((select jsonb_agg(row order by (row ->> 'created_at')::timestamptz desc) from (
         select jsonb_build_object('id', up.id, 'body', up.body, 'created_at', up.created_at,
                  'project', jsonb_build_object('id', pj.id, 'title', pj.title, 'stage', pj.stage, 'cover_url', pj.cover_url),
@@ -346,7 +347,8 @@ begin
                pj.owner_id = u
             or private.are_connected(u, pj.owner_id)
             or exists (select 1 from public.project_saves s where s.project_id = pj.id and s.user_id = u)
-            or exists (select 1 from public.group_project_shares sh where sh.project_id = pj.id and private.is_group_member(sh.group_id, u)))
+            or exists (select 1 from public.group_project_shares sh where sh.project_id = pj.id and private.is_group_member(sh.group_id, u))
+            or (select interests from public.profiles where id = pj.owner_id) && (select interests from public.profiles where id = u))
          order by up.created_at desc limit 6) s), '[]'),
     'sessions', public.list_sessions('{}'),
     'ranking', (select jsonb_build_object('top', coalesce(jsonb_agg(e) filter (where (e ->> 'rank')::int <= 3), '[]'), 'me', r -> 'me')

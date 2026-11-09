@@ -566,6 +566,25 @@ describe("blocking and reporting", () => {
   });
 });
 
+describe("read endpoints", () => {
+  test("home, creator table, profile, conversations and projects return data for a member", async () => {
+    const a = await member();
+    const b = await member();
+    await call(a, "create_project", { title: "Proyecto visible" });
+    const home = await call(a, "home_feed");
+    assert.ok(home.groups.length >= 1);
+    assert.ok(Array.isArray(home.updates) && Array.isArray(home.sessions));
+    assert.ok(home.ranking && "me" in home.ranking);
+    assert.ok(Array.isArray(await call(a, "creator_table")));
+    const prof = await call(b, "get_profile", { id: a });
+    assert.equal(prof.projects.length, 1);
+    assert.ok(Array.isArray(await call(a, "list_conversations")));
+    assert.ok((await call(b, "list_projects", { scope: "all" })).length >= 1);
+    assert.ok(await call(a, "get_settings"));
+    assert.ok(await call(a, "ranking", { period: "all" }));
+  });
+});
+
 describe("access", () => {
   test("anonymous callers cannot execute API functions", async () => {
     await rejects(call(null, "discover_feed"), "permission denied");

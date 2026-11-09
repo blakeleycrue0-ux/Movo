@@ -1,69 +1,80 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
+import { ArrowRight } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
+import { CreatorTable, type TableItem } from "@/components/home/CreatorTable";
+import { Chip } from "@/components/ui/kit";
+import { Splash } from "@/components/Splash";
+import { useApp } from "@/lib/app-context";
+import { t } from "@/i18n";
+
+// Decorative illustrations: activity labels only, no invented names or counts.
+const ILLUSTRATIVE: TableItem[] = [
+  "Creando una app", "Busca editor", "Canal faceless", "Diseño de marca", "Aprende a editar",
+  "Lanza su web", "Música", "Busca feedback", "Ilustración", "Animación 3D",
+].map((label, i) => ({ id: `ill-${i}`, name: null, label, avatar: `gen:welcome-${i * 7 + 3}` }));
+
+export default function Welcome() {
+  const { status, backend } = useApp();
+  const router = useRouter();
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    if (status === "ready") router.replace("/inicio");
+    if (status === "onboarding") router.replace("/bienvenida");
+  }, [status, router]);
+
+  if (status === "booting" || status === "ready" || status === "onboarding") return <Splash />;
+
+  const fade = (d: number) => (reduce ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay: d, duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="relative flex min-h-dvh flex-col overflow-hidden" style={{ paddingTop: "var(--safe-t)", paddingBottom: "var(--safe-b)" }}>
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-5 md:px-8">
+        <Logo height={30} />
+        {backend?.mode === "demo" && <Chip tone="sun">{t.demo.badge}</Chip>}
+      </header>
+
+      <div className="mx-auto grid w-full max-w-6xl flex-1 content-center items-center gap-2 px-4 pb-8 md:grid-cols-[1fr_1.15fr] md:gap-10 md:px-8">
+        <div className="order-2 px-1 text-center md:order-1 md:text-left">
+          <motion.h1 {...fade(0.1)} className="mx-auto max-w-md text-[32px] leading-[1.08] text-balance md:mx-0 md:text-[52px]">
+            {t.welcome.tagline}
+          </motion.h1>
+          <motion.p {...fade(0.2)} className="mx-auto mt-4 max-w-md text-[16px] text-ink-2 text-balance md:mx-0 md:text-[17px]">
+            {t.welcome.sub}
+          </motion.p>
+          <motion.div {...fade(0.3)} className="mt-7 flex flex-col items-center gap-3 md:flex-row md:items-center md:gap-5">
+            <Link href="/entrar?modo=registro"
+              className="inline-flex h-[54px] w-full max-w-xs items-center justify-center gap-2 rounded-full bg-ink px-7 text-[16px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.12)] transition hover:bg-[#33363a] active:scale-[0.98] md:w-auto">
+              {t.welcome.cta} <ArrowRight className="h-4.5 w-4.5" aria-hidden />
+            </Link>
+            <Link href="/entrar?modo=entrar" className="rounded-full px-4 py-2 text-[15px] font-semibold text-ink underline-offset-4 hover:underline">
+              {t.welcome.haveAccount}
+            </Link>
+          </motion.div>
+          {backend?.mode === "demo" && (
+            <p className="mx-auto mt-6 max-w-md rounded-2xl bg-sun-soft px-4 py-3 text-left text-[13px] text-[#6b4a0f] md:mx-0">{t.demo.banner}</p>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="order-1 md:order-2">
+          <CreatorTable
+            items={ILLUSTRATIVE}
+            interactive
+            compact
+            ariaLabel="Ilustración de tarjetas de creadores"
+            center={
+              <div className="flex h-[22cqw] max-h-[104px] w-[22cqw] max-w-[104px] items-center justify-center rounded-full bg-card shadow-lg ring-1 ring-black/5 md:h-[14cqw] md:w-[14cqw]">
+                <Logo height={18} />
+              </div>
+            }
+          />
         </div>
-      </main>
+      </div>
     </div>
   );
 }
